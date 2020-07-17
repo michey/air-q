@@ -39,6 +39,8 @@ void bme_rx_task(void *qPointer) {
   int8_t rslt;
   init_i2c();
   bme_init();
+
+  vTaskDelay(LOCAL_DELAY / 3);
   while (1) {
     vTaskDelay(LOCAL_DELAY);
 
@@ -54,6 +56,7 @@ void bme_rx_task(void *qPointer) {
     cJSON *json_result = prepare_temperature(pressure, comp_data.temperature,
                                              comp_data.humidity);
 
-    xQueueSend(log_queue, &json_result, 10);
+    xQueueSend(log_queue, &json_result, 0);
+    taskYIELD();
   }
 }

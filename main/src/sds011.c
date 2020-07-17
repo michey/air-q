@@ -11,7 +11,6 @@ void sds_init() {
   esp_log_level_set(_SDS_LOG_TAG, ESP_LOG_INFO);
   // vTaskDelay(15000 / portTICK_PERIOD_MS);
   // sendData(_SDS_LOG_TAG, UART_NUM_SDS, set_id, 19);
-  vTaskDelay(5000 / portTICK_PERIOD_MS);
   sendData(_SDS_LOG_TAG, UART_NUM_SDS, set_period, 19);
 }
 
@@ -47,7 +46,7 @@ void sds_rx_task(void *qPointer) {
         // ESP_LOGI(_SDS_LOG_TAG, "PM2.5 %.1f, PM10 %.1f", thinDust, thickDust);
 
         cJSON *json_result = prepare_dust(thinDust, thickDust);
-        xQueueSend(log_queue, &json_result, 10);
+        xQueueSend(log_queue, &json_result, 0);
         break;
       }
 
@@ -57,6 +56,7 @@ void sds_rx_task(void *qPointer) {
         break;
       }
     }
+    taskYIELD();
   }
   free(data);
 }

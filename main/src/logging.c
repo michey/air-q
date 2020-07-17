@@ -42,7 +42,8 @@ void poll_log_queue(void *qPointer) {
   xQueueHandle log_queue = qPointer;
   cJSON *fp = NULL;
   while (1) {
-    if (xQueueReceive(log_queue, &fp, 1 / portTICK_PERIOD_MS)) {
+    vTaskDelay(10000 / portTICK_PERIOD_MS);
+    if (xQueueReceive(log_queue, &fp, 0)) {
       char *rendered = cJSON_PrintUnformatted(fp);
       ESP_LOGI(_GENERAL_LOG_TAG, "%s", rendered);
       send_event(rendered);
@@ -50,6 +51,6 @@ void poll_log_queue(void *qPointer) {
       free(rendered);
       led_blink(500);
     }
-    vTaskDelay(500 / portTICK_PERIOD_MS);
+    taskYIELD();
   }
 }

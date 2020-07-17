@@ -15,8 +15,8 @@
 #include "string.h"
 
 #define UART_NUM_MHZ UART_NUM_1
-#define MHZ_TXD_PIN (GPIO_NUM_10)
-#define MHZ_RXD_PIN (GPIO_NUM_9)
+#define MHZ_TXD_PIN (GPIO_NUM_32)
+#define MHZ_RXD_PIN (GPIO_NUM_33)
 
 void mhz_tx_task();
 void mhz_rx_task(void *qPointer);

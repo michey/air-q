@@ -8,7 +8,7 @@
 #include "esp_system.h"
 #include "string.h"
 
-static const int RX_BUF_SIZE = 256;
+static const int RX_BUF_SIZE = 512;
 
 int sendData(const char *log_tag, uart_port_t uart_num, const char *data,
              const int len);

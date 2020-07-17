@@ -13,5 +13,5 @@
 #include "logging.h"
 #include "string.h"
 
-#define LOCAL_DELAY (20000 / portTICK_PERIOD_MS)
+#define LOCAL_DELAY (60000 / portTICK_PERIOD_MS)
 #endif

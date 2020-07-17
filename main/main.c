@@ -36,11 +36,24 @@ void app_main(void) {
 
   log_queue = xQueueCreate(10, sizeof(uint32_t));
 
-  xTaskCreate(poll_log_queue, "poll_log_queue", 1024 * 2, (void *)log_queue,
-              configMAX_PRIORITIES - 5, NULL);
+  // Initialize NVS
+  esp_err_t ret = nvs_flash_init();
+  if (ret == ESP_ERR_NVS_NO_FREE_PAGES ||
+      ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
+    ESP_ERROR_CHECK(nvs_flash_erase());
+    ret = nvs_flash_init();
+  }
+  ESP_ERROR_CHECK(ret);
 
   init_serial(UART_NUM_MHZ, 9600, RX_BUF_SIZE, MHZ_TXD_PIN, MHZ_RXD_PIN);
   init_serial(UART_NUM_SDS, 9600, RX_BUF_SIZE, SDS_TXD_PIN, SDS_RXD_PIN);
+
+  ESP_LOGI(_MAIN_TAG, "ESP_WIFI_MODE_STA");
+  wifi_init_sta();
+  init_mqtt();
+
+  xTaskCreatePinnedToCore(poll_log_queue, "poll_log_queue", 1024 * 2,
+                          (void *)log_queue, configMAX_PRIORITIES - 8, NULL, 1);
 
   xTaskCreate(sds_rx_task, "sds_rx_task", 1024 * 2, (void *)log_queue,
               configMAX_PRIORITIES - 1, NULL);
@@ -52,17 +65,4 @@ void app_main(void) {
 
   xTaskCreate(bme_rx_task, "bme_rx_task", 1024 * 2, (void *)log_queue,
               configMAX_PRIORITIES - 2, NULL);
-
-  // Initialize NVS
-  esp_err_t ret = nvs_flash_init();
-  if (ret == ESP_ERR_NVS_NO_FREE_PAGES ||
-      ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-    ESP_ERROR_CHECK(nvs_flash_erase());
-    ret = nvs_flash_init();
-  }
-  ESP_ERROR_CHECK(ret);
-
-  ESP_LOGI(_MAIN_TAG, "ESP_WIFI_MODE_STA");
-  wifi_init_sta();
-  init_mqtt();
 }
